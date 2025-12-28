@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro - PyMotors</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-page">
+    <div class="auth-card">
+        <h2>Criar Conta</h2>
+        <form method="POST">
+            <input type="text" name="nome" placeholder="Nome Completo" required>
+            <input type="email" name="email" placeholder="E-mail" required>
+            <input type="password" name="senha" placeholder="Senha" required>
+            
+            <label>Eu sou:</label>
+            <select name="tipo">
+                <option value="cliente">Cliente (Quero Comprar)</option>
+                <option value="vendedor">Vendedor (Quero Anunciar)</option>
+            </select>
+            
+            <button type="submit" class="btn-primary full">Cadastrar</button>
+        </form>
+        <p>Já tem conta? <a href="/login">Faça Login</a></p>
+    </div>
+</body>
+</html>

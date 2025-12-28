@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - PyMotors</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-page">
+    <div class="auth-card">
+        <h2>Entrar no PyMotors</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}<p class="error">{{ messages[0] }}</p>{% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <input type="email" name="email" placeholder="Seu E-mail" required>
+            <input type="password" name="senha" placeholder="Sua Senha" required>
+            <button type="submit" class="btn-primary full">Entrar</button>
+        </form>
+        <p>Não tem conta? <a href="/registro">Cadastre-se</a></p>
+        <p><a href="/">Voltar para a loja</a></p>
+    </div>
+</body>
+</html>
