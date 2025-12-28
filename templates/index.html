@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PyMotors</title>
+    <title>AutoMind - TCC Inteligente</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
-        <div class="logo">🏎️ PyMotors</div>
+        <div class="logo">
+            <span class="material-icons" style="vertical-align: middle;">psychology</span> 
+            AutoMind <span style="font-size: 0.8rem; opacity: 0.7;">(IA Beta)</span>
+        </div>
         
         <div class="user-controls">
             <button id="toggle-theme" class="btn-icon"><span class="material-icons">dark_mode</span></button>
             
             {% if current_user.is_authenticated %}
-                <span class="welcome">Olá, {{ current_user.nome }} ({{ current_user.tipo }})</span>
+                <span class="welcome">Olá, {{ current_user.nome }}</span>
                 
                 {% if current_user.tipo == 'vendedor' %}
                     <button onclick="toggleForm()" class="btn-primary">+ Anunciar</button>
@@ -24,39 +27,94 @@
                 <a href="/logout" class="btn-secondary">Sair</a>
             {% else %}
                 <a href="/login" class="btn-primary">Entrar</a>
-                <a href="/registro" class="btn-secondary">Cadastrar</a>
+                <a href="/registro" class="btn-secondary">Criar Conta</a>
             {% endif %}
         </div>
     </header>
 
+    <div class="filtros-container">
+        <a href="/" class="chip {{ 'ativo' if not request.args.get('categoria') else '' }}">Todos</a>
+        <a href="/?categoria=Carro" class="chip {{ 'ativo' if request.args.get('categoria') == 'Carro' else '' }}">Carros</a>
+        <a href="/?categoria=Moto" class="chip {{ 'ativo' if request.args.get('categoria') == 'Moto' else '' }}">Motos</a>
+        <a href="/?categoria=Caminhao" class="chip {{ 'ativo' if request.args.get('categoria') == 'Caminhao' else '' }}">Caminhões</a>
+    </div>
+
     <div class="container">
         <div id="form-anuncio" class="card-form hidden">
-            <h3>Novo Anúncio</h3>
+            <div class="form-header">
+                <h3>Novo Anúncio Inteligente</h3>
+                <span class="badge-ia">Powered by AI</span>
+            </div>
+            
             <form action="/anunciar" method="POST" enctype="multipart/form-data">
-                <input type="text" name="modelo" placeholder="Modelo" required>
                 <div class="row">
-                    <input type="text" name="marca" placeholder="Marca" required>
-                    <input type="number" name="ano" placeholder="Ano" required>
+                    <div class="col">
+                        <label>Tipo de Veículo</label>
+                        <select name="categoria" required>
+                            <option value="Carro">Carro</option>
+                            <option value="Moto">Moto</option>
+                            <option value="Caminhao">Caminhão</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>Modelo</label>
+                        <input type="text" name="modelo" placeholder="Ex: Civic LXR" required>
+                    </div>
                 </div>
-                <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required>
-                <input type="file" name="foto" accept="image/*">
-                <button type="submit" class="btn-save">Publicar</button>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Marca</label>
+                        <input type="text" name="marca" placeholder="Ex: Honda" required>
+                    </div>
+                    <div class="col">
+                        <label>Ano Fabricação</label>
+                        <input type="number" id="input-ano" name="ano" placeholder="Ex: 2018" required>
+                    </div>
+                    <div class="col">
+                        <label>Quilometragem (KM)</label>
+                        <input type="number" id="input-km" name="km" placeholder="Ex: 65000" required>
+                    </div>
+                </div>
+
+                <label>Preço de Venda (R$)</label>
+                <div class="row-ia">
+                    <input type="number" step="0.01" id="input-preco" name="preco" placeholder="Digite ou use a IA ->" required>
+                    
+                    <button type="button" onclick="consultarIA()" class="btn-ia">
+                        <span class="material-icons">auto_awesome</span> Sugerir Preço
+                    </button>
+                </div>
+                <p id="msg-ia" class="msg-ia-texto"></p>
+
+                <div class="file-area">
+                    <label>Foto do Veículo</label>
+                    <input type="file" name="foto" accept="image/*">
+                </div>
+
+                <button type="submit" class="btn-save">Publicar Anúncio</button>
             </form>
         </div>
 
         <div class="grid-carros">
-            {% for carro in carros %}
+            {% for v in veiculos %}
             <div class="card-carro">
-                <img src="{{ url_for('static', filename='uploads/' + carro.imagem) }}" onerror="this.src='https://via.placeholder.com/300?text=Carro'">
+                <div class="img-wrapper">
+                    <img src="{{ url_for('static', filename='uploads/' + v.imagem) }}" onerror="this.src='https://via.placeholder.com/300x200?text=Sem+Foto'">
+                    <span class="cat-tag">{{ v.categoria }}</span>
+                </div>
                 <div class="detalhes">
-                    <h4>{{ carro.modelo }}</h4>
-                    <p class="marca">{{ carro.marca }} • {{ carro.ano }}</p>
-                    <p class="preco">R$ {{ "%.2f"|format(carro.preco) }}</p>
+                    <h4>{{ v.modelo }}</h4>
+                    <p class="marca">{{ v.marca }} • {{ v.ano }}</p>
+                    <div class="specs">
+                        <span><i class="material-icons" style="font-size: 12px;">speed</i> {{ v.km }} km</span>
+                    </div>
+                    <p class="preco">R$ {{ "%.2f"|format(v.preco) }}</p>
                     
-                    {% if current_user.is_authenticated and current_user.id == carro.vendedor_id %}
-                        <a href="/deletar/{{ carro.id }}" class="btn-delete">Excluir Anúncio</a>
+                    {% if current_user.is_authenticated and current_user.id == v.vendedor_id %}
+                        <a href="/deletar/{{ v.id }}" class="btn-delete">Excluir</a>
                     {% else %}
-                        <button class="btn-buy">Tenho Interesse</button>
+                        <a href="/veiculo/{{ v.id }}" class="btn-buy">Ver Detalhes</a>
                     {% endif %}
                 </div>
             </div>
@@ -69,7 +127,7 @@
             document.getElementById('form-anuncio').classList.toggle('hidden');
         }
 
-        // Script do Dark Mode
+        // Lógica do Dark Mode
         const toggleBtn = document.getElementById('toggle-theme');
         const icon = toggleBtn.querySelector('span');
         const body = document.body;
@@ -89,6 +147,41 @@
                 icon.textContent = 'dark_mode';
             }
         });
+
+        // Lógica da IA
+        async function consultarIA() {
+            const ano = document.getElementById('input-ano').value;
+            const km = document.getElementById('input-km').value;
+            const msg = document.getElementById('msg-ia');
+            const campoPreco = document.getElementById('input-preco');
+            const btnIA = document.querySelector('.btn-ia');
+
+            if (!ano || !km) {
+                msg.style.color = 'red';
+                msg.innerText = "⚠️ Preencha Ano e KM para a IA calcular!";
+                return;
+            }
+
+            msg.style.color = 'var(--primary)';
+            msg.innerText = "🤖 Analisando mercado...";
+            btnIA.classList.add('loading');
+
+            try {
+                const response = await fetch('/api/estimar_preco', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ano: ano, km: km })
+                });
+
+                const data = await response.json();
+                
+                campoPreco.value = data.preco_sugerido;
+                msg.innerText = "✅ Preço ideal calculado com base na depreciação!";
+                btnIA.classList.remove('loading');
+            } catch (error) {
+                msg.innerText = "Erro ao conectar com a IA.";
+            }
+        }
     </script>
 </body>
 </html>

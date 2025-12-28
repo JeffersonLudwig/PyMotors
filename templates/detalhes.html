@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ veiculo.modelo }} - AutoMind</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="/" class="btn-back-float">
+        <span class="material-icons">arrow_back</span> Voltar
+    </a>
+
+    <div class="container" style="margin-top: 50px;">
+        <div class="detalhes-grid">
+            <div class="card-foto-grande">
+                <span class="tag-destaque">{{ veiculo.categoria }}</span>
+                <img src="{{ url_for('static', filename='uploads/' + veiculo.imagem) }}" onerror="this.src='https://via.placeholder.com/800x600?text=Sem+Foto'">
+            </div>
+
+            <div class="card-info-compra">
+                <h1 class="titulo-carro">{{ veiculo.modelo }}</h1>
+                <p class="subtitulo">{{ veiculo.marca }} • {{ veiculo.ano }}</p>
+                
+                <div class="preco-destaque">
+                    R$ {{ "%.2f"|format(veiculo.preco) }}
+                </div>
+
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="material-icons">speed</span>
+                        <strong>{{ veiculo.km }} km</strong>
+                        <span>Rodados</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="material-icons">calendar_today</span>
+                        <strong>{{ veiculo.ano }}</strong>
+                        <span>Ano/Modelo</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="material-icons">palette</span>
+                        <strong>Única</strong>
+                        <span>Cor</span>
+                    </div>
+                </div>
+
+                <div class="vendedor-box">
+                    <p>Anunciado por: <strong>{{ vendedor.nome }}</strong></p>
+                    
+                    <a href="https://wa.me/5511999999999?text=Olá, vi o anúncio do {{ veiculo.modelo }} no AutoMind e tenho interesse." target="_blank" class="btn-whatsapp">
+                        <span class="material-icons">chat</span> Conversar no WhatsApp
+                    </a>
+                    
+                    {% if current_user.is_authenticated and current_user.id == veiculo.vendedor_id %}
+                        <a href="/deletar/{{ veiculo.id }}" class="btn-delete-big">Excluir meu Anúncio</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if relacionados %}
+        <h3 style="margin-top: 50px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Veja também</h3>
+        <div class="grid-carros">
+            {% for v in relacionados %}
+            <div class="card-carro">
+                <div class="img-wrapper">
+                    <img src="{{ url_for('static', filename='uploads/' + v.imagem) }}">
+                </div>
+                <div class="detalhes">
+                    <h4>{{ v.modelo }}</h4>
+                    <p class="preco">R$ {{ "%.2f"|format(v.preco) }}</p>
+                    <a href="/veiculo/{{ v.id }}" class="btn-buy">Ver Oferta</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Modo Escuro
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+    </script>
+</body>
+</html>

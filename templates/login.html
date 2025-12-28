@@ -2,23 +2,55 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Login - PyMotors</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AutoMind</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="auth-page">
+    
+    <a href="/" class="btn-back">
+        <span class="material-icons">arrow_back</span> Voltar
+    </a>
+
     <div class="auth-card">
-        <h2>Entrar no PyMotors</h2>
+        <div class="logo" style="justify-content: center; margin-bottom: 20px;">
+            <span class="material-icons" style="font-size: 2rem;">psychology</span> 
+        </div>
+        <h2>Entrar no AutoMind</h2>
+        
         {% with messages = get_flashed_messages() %}
-            {% if messages %}<p class="error">{{ messages[0] }}</p>{% endif %}
+            {% if messages %}
+                <div class="msg-error">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
         {% endwith %}
         
         <form method="POST">
-            <input type="email" name="email" placeholder="Seu E-mail" required>
-            <input type="password" name="senha" placeholder="Sua Senha" required>
+            <div class="input-group">
+                <span class="material-icons input-icon">email</span>
+                <input type="email" name="email" placeholder="Seu E-mail" required>
+            </div>
+            
+            <div class="input-group">
+                <span class="material-icons input-icon">lock</span>
+                <input type="password" name="senha" placeholder="Sua Senha" required>
+            </div>
+            
             <button type="submit" class="btn-primary full">Entrar</button>
         </form>
-        <p>Não tem conta? <a href="/registro">Cadastre-se</a></p>
-        <p><a href="/">Voltar para a loja</a></p>
+        
+        <p style="margin-top: 15px; font-size: 0.9rem;">
+            Ainda não tem conta? <a href="/registro" style="color: var(--primary); font-weight: bold;">Crie agora</a>
+        </p>
     </div>
+
+    <script>
+        // Aplica o tema escuro se estiver salvo
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
 </body>
 </html>

@@ -2,26 +2,62 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro - PyMotors</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - AutoMind</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="auth-page">
+
+    <a href="/" class="btn-back">
+        <span class="material-icons">arrow_back</span> Voltar
+    </a>
+
     <div class="auth-card">
+        <div class="logo" style="justify-content: center; margin-bottom: 20px;">
+            <span class="material-icons" style="font-size: 2rem;">psychology</span> 
+        </div>
         <h2>Criar Conta</h2>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Junte-se à revolução automotiva</p>
+
         <form method="POST">
-            <input type="text" name="nome" placeholder="Nome Completo" required>
-            <input type="email" name="email" placeholder="E-mail" required>
-            <input type="password" name="senha" placeholder="Senha" required>
+            <div class="input-group">
+                <span class="material-icons input-icon">person</span>
+                <input type="text" name="nome" placeholder="Nome Completo" required>
+            </div>
+
+            <div class="input-group">
+                <span class="material-icons input-icon">email</span>
+                <input type="email" name="email" placeholder="E-mail" required>
+            </div>
+
+            <div class="input-group">
+                <span class="material-icons input-icon">lock</span>
+                <input type="password" name="senha" placeholder="Crie uma Senha" required>
+            </div>
             
-            <label>Eu sou:</label>
-            <select name="tipo">
-                <option value="cliente">Cliente (Quero Comprar)</option>
-                <option value="vendedor">Vendedor (Quero Anunciar)</option>
-            </select>
+            <label style="display: block; text-align: left; margin-top: 10px;">Eu sou:</label>
+            <div class="input-group">
+                <span class="material-icons input-icon">badge</span>
+                <select name="tipo" required>
+                    <option value="" disabled selected>Selecione...</option>
+                    <option value="cliente">Cliente (Quero Comprar)</option>
+                    <option value="vendedor">Vendedor (Quero Anunciar)</option>
+                </select>
+            </div>
             
             <button type="submit" class="btn-primary full">Cadastrar</button>
         </form>
-        <p>Já tem conta? <a href="/login">Faça Login</a></p>
+        
+        <p style="margin-top: 15px; font-size: 0.9rem;">
+            Já tem conta? <a href="/login" style="color: var(--primary); font-weight: bold;">Faça Login</a>
+        </p>
     </div>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
 </body>
 </html>
